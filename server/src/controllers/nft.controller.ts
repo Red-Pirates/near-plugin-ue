@@ -1,60 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { nftService } from '../service/nft.service';
-import { NearNFTMetadata, NFTResponse } from '../models/NFT';
-
-interface MintNFTBody {
-  receiverId: string;
-  tokenMetadata: NearNFTMetadata;
-  tokenId: string;
-}
-
-interface TransferTokenBody {
-  receiverId: string;
-  tokenId: string;
-  memo: string;
-}
-
-interface GetTokenBody {
-  tokenId: string;
-  contractId?: string;
-}
-
-interface GetOwnerNFTTokens {
-  accountId: string;
-  contractId: string;
-  fromIndex: string;
-  limit: number;
-}
-
-interface GetOwnerNFTTokensSupply {
-  accountId: string;
-  contractId: string;
-}
-
-export const mintNFT = (
-  req: Request<never, never, MintNFTBody>,
-  res: Response,
-  next: NextFunction,
-): void => {
-  nftService
-    .mintNFT(req.body.tokenMetadata, req.body.receiverId, req.body.tokenId)
-    .then((state) => res.json(state))
-    .catch(next);
-};
-
-export const transferToken = (
-  req: Request<never, never, TransferTokenBody>,
-  res: Response,
-  next: NextFunction,
-): void => {
-  nftService
-    .transferToken(req.body.receiverId, req.body.tokenId, req.body.memo)
-    .then(() => res.json())
-    .catch(next);
-};
+import {
+  GetOwnerNFTTokensRequest,
+  GetOwnerNFTTokensSupplyRequest,
+  GetTokenRequest,
+  NFTResponse,
+} from '../models/NFT';
 
 export const getNFTTokens = (
-  req: Request<never, never, GetOwnerNFTTokens>,
+  req: Request<never, never, GetOwnerNFTTokensRequest>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -65,7 +19,7 @@ export const getNFTTokens = (
 };
 
 export const getNFTSupply = (
-  req: Request<never, never, GetOwnerNFTTokensSupply>,
+  req: Request<never, never, GetOwnerNFTTokensSupplyRequest>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -76,7 +30,7 @@ export const getNFTSupply = (
 };
 
 export const getToken = (
-  req: Request<never, never, GetTokenBody>,
+  req: Request<never, never, GetTokenRequest>,
   res: Response<NFTResponse>,
   next: NextFunction,
 ): void => {

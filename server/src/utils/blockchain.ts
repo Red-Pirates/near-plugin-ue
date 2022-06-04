@@ -110,20 +110,9 @@ export const createTransactionSignUrl = async (
   return newUrl.href;
 };
 
-export const createLoginWalletUrl = async (
-  accountId: string,
-  contractId: string,
-  methodNames?: string[],
-) => {
+export const createLoginWalletUrl = async (contractId: string, methodNames?: string[]) => {
   const newUrl = new URL(`https://wallet.${config.NETWORK_ID}.near.org` + '/login/');
   const accessKey = KeyPair.fromRandom('ed25519');
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  keyStore.setKey(config.NETWORK_ID, accountId, accessKey.secretKey);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  console.log(accessKey.secretKey);
 
   newUrl.searchParams.set('success_url', 'http://localhost:3000/api/v1/auth/login_success');
   newUrl.searchParams.set('failure_url', 'http://localhost:3000/api/v1/auth/login_failed');

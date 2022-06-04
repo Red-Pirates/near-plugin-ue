@@ -18,6 +18,7 @@ jspm_packages/
 .env
 .env-local
 .env-remote
+.test.env
 
 .deployment
 .vscode

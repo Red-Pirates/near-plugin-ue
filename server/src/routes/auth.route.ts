@@ -1,11 +1,10 @@
 import { createLoginWalletUrl, createTransactionSignUrl } from '../utils/blockchain';
-import config from '../config';
 import express from 'express';
 
 const router = express.Router();
 
 router.post('/login-url', async (request, response) => {
-  const url = await createLoginWalletUrl(request.body.accountId, config.CONTRACT_NAME);
+  const url = await createLoginWalletUrl(request.body.contractId);
   response.json(url);
 });
 

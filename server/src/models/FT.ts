@@ -14,3 +14,12 @@ export interface FTBalanceResponse {
   icon: string | null;
   balance: string;
 }
+
+export interface GetFTAccountBalanceRequest {
+  contractId: string;
+  accountId: string;
+}
+
+export interface GetFTTotalBalanceRequest {
+  contractId: string;
+}

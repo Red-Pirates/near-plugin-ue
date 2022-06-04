@@ -1,0 +1,271 @@
+openapi: 3.0.0
+info:
+  description: Near node.js service Open API specification
+  version: v1
+  title: Near node.js service
+
+tags:
+  - name: Account
+    description: Operations with near account
+  - name: Fungible token
+    description: Operations with near fungible tokens
+  - name: Non Fungible Token
+    description: Operations with near non fungible tokens
+
+servers:
+  - url: http://localhost:3000/api/v1
+
+paths:
+  /account/{id}/balance:
+    get:
+      tags:
+        - Account
+      description: Get account balance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountBalanceResponce"
+        500:
+          description: Internal Server Error
+
+  /ft/balance:
+    post:
+      tags:
+        - Fungible token
+      description: Get the balance of fungible tokens in the account
+      requestBody:
+        $ref: '#/components/requestBodies/GetFTAccountBalanceRequest'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FTBalanceResponse"
+        500:
+          description: Internal Server Error
+
+  /ft/total-balance:
+    post:
+      tags:
+        - Fungible token
+      description: Get the total balance of fungible tokens
+      requestBody:
+        $ref: '#/components/requestBodies/GetFTTotalBalanceRequest'
+      responses:
+        204:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FTBalanceResponse"
+        500:
+          description: Internal Server Error
+
+  /nft/get:
+    post:
+      tags:
+        - Non Fungible Token
+      description: Get info about non fungible token
+      requestBody:
+        $ref: '#/components/requestBodies/GetTokenRequest'
+      responses:
+        204:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NFTResponse"
+        500:
+          description: Internal Server Error
+
+  /nft/get-many:
+    post:
+      tags:
+        - Non Fungible Token
+      description: Get list of nfts
+      requestBody:
+        $ref: '#/components/requestBodies/GetOwnerNFTTokensRequest'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NFTResponse"
+        500:
+          description: Internal Server Error
+
+  /nft/supply:
+    post:
+      tags:
+        - Non Fungible Token
+      description: Get nft supply for owner
+      requestBody:
+        $ref: '#/components/requestBodies/GetOwnerNFTSupplyRequest'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+        500:
+          description: Internal Server Error
+
+components:
+  requestBodies:
+    GetFTAccountBalanceRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetFTAccountBalanceRequest"
+      description: Request model for getting the balance of fungible tokens
+      required: true
+
+    GetFTTotalBalanceRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetFTTotalBalanceRequest"
+      description: Request model for getting the total balance of fungible tokens
+      required: true
+
+    GetOwnerNFTTokensRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetOwnerNFTTokensRequest"
+      description: Request model for getting nfts by owner
+      required: true
+
+    GetTokenRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetTokenRequest"
+      description: Request model for getting info about nft
+      required: true
+
+    GetOwnerNFTSupplyRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GetOwnerNFTSupplyRequest"
+      description: Request model for getting nft sypply by owner
+      required: true
+
+
+  schemas:
+    GetFTTotalBalanceRequest:
+      type: object
+      properties:
+        contractId:
+          type: string
+
+    GetFTAccountBalanceRequest:
+      type: object
+      properties:
+        contractId:
+          type: string
+        accountId:
+          type: string
+
+    GetOwnerNFTTokensRequest:
+      type: object
+      properties:
+        contractId:
+          type: string
+        accountId:
+          type: string
+        fromIndex:
+          type: string
+        limit:
+          type: number
+
+    GetOwnerNFTSupplyRequest:
+      type: object
+      properties:
+        contractId:
+          type: string
+        accountId:
+          type: string
+
+    GetTokenRequest:
+      type: object
+      properties:
+        contractId:
+          type: string
+        tokenId:
+          type: string
+
+    NFTResponse:
+      type: object
+      properties:
+        tokenId:
+          type: string
+        ownerId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        media:
+          type: string
+        copies:
+          type: number
+        mediaHash:
+          type: string
+        issuedAt:
+          type: number
+        expiresAt:
+          type: number
+        startsAt:
+          type: number
+        updatedAt:
+          type: number
+        extra:
+          type: string
+        reference:
+          type: string
+        referenceHash:
+          type: string
+
+
+    FTBalanceResponse:
+      type: object
+      description: Response model for the balance of fungible tokens in the account
+      properties:
+        tokenName:
+          type: string
+        symbol:
+          type: string
+        icon:
+          type: string
+        balance:
+          type: string
+
+
+    AccountBalanceResponce:
+      type: object
+      description: Responce model for the account balance
+      properties:
+        total:
+          type: string
+        stateStaked:
+          type: string
+        staked:
+          type: string
+        available:
+          type: string

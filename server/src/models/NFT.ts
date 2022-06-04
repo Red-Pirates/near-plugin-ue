@@ -15,6 +15,23 @@ export interface NFTResponse {
   referenceHash: string | null;
 }
 
+export interface GetTokenRequest {
+  tokenId: string;
+  contractId?: string;
+}
+
+export interface GetOwnerNFTTokensRequest {
+  accountId: string;
+  contractId: string;
+  fromIndex: string;
+  limit: number;
+}
+
+export interface GetOwnerNFTTokensSupplyRequest {
+  accountId: string;
+  contractId: string;
+}
+
 export interface NearNFTMetadata {
   title: string | null; // ex. "Arch Nemesis: Mail Carrier" or "Parcel #5055"
   description: string | null; // free-form description
