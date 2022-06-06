@@ -1,0 +1,20 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.NearPlugin.cpp.obj": [
+			"HttpNearBackManager.cpp.obj",
+			"NearPlugin.cpp.obj"
+		],
+		"Module.NearPlugin.gen.cpp.obj": [
+			"FAccountBalanceStruct.gen.cpp.obj",
+			"FAccountNFTStruct.gen.cpp.obj",
+			"FFTBalanceStruct.gen.cpp.obj",
+			"FGetAccountNFTRequestStruct.gen.cpp.obj",
+			"FGetFTBalanceRequestStruct.gen.cpp.obj",
+			"FGetNFTRequestStruct.gen.cpp.obj",
+			"FNFTMetadataStruct.gen.cpp.obj",
+			"HttpNearBackManager.gen.cpp.obj",
+			"NearPlugin.init.gen.cpp.obj"
+		]
+	}
+}
