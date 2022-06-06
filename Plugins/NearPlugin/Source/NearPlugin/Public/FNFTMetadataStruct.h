@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "FNFTMetadataStruct.generated.h"
 
 USTRUCT(BlueprintType)

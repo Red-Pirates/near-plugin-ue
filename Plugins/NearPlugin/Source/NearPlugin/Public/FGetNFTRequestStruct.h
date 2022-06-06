@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "FGetNFTRequestStruct.generated.h"
 
 USTRUCT(BlueprintType)

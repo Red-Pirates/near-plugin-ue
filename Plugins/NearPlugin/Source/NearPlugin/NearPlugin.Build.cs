@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 using UnrealBuildTool;
 
 public class NearPlugin : ModuleRules
@@ -10,7 +8,7 @@ public class NearPlugin : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				// ... add public include paths required here ...
+				
 			}
 			);
 				
@@ -18,7 +16,6 @@ public class NearPlugin : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"NearPlugin/Private"
-				// ... add other private include paths required here ...
 			}
 			);
 			
@@ -29,8 +26,7 @@ public class NearPlugin : ModuleRules
 				"Core",
 				"Json",
                 "JsonUtilities",
-                "HTTP",
-				// ... add other public dependencies that you statically link with here ...
+                "HTTP"
 			}
 			);
 			
@@ -41,8 +37,7 @@ public class NearPlugin : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
+				"SlateCore"
 			}
 			);
 		
@@ -50,7 +45,7 @@ public class NearPlugin : ModuleRules
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
-				// ... add any modules that your module loads dynamically here ...
+				
 			}
 			);
 	}

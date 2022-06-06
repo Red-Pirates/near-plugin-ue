@@ -1,19 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "HttpNearBackManager.h"
+﻿#include "HttpNearBackManager.h"
 #include "HttpModule.h"
-#include "IHttpResponse.h"
 #include "JsonObjectConverter.h"
 #include "FAccountBalanceStruct.h"
 #include "FNFTMetadataStruct.h"
 #include "FGetFTBalanceRequestStruct.h"
 #include "FGetNFTRequestStruct.h"
-
-
-UHttpNearBackManager::UHttpNearBackManager()
-{
-}
+#include "Interfaces/IHttpResponse.h"
 
 void UHttpNearBackManager::SendAccountBalanceRequest(FString AccountId)
 {
@@ -32,11 +24,11 @@ void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Requ
 	
 	const FString Data = Response->GetContentAsString();
 	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
-	UE_LOG(LogTemp, Warning, TEXT("Near account balance: %s"), *Data);
-	UE_LOG(LogTemp, Warning, TEXT("Near account balance: %s"), *AccountBalance.Total);
-	UE_LOG(LogTemp, Warning, TEXT("Near account balance: %s"), *AccountBalance.Staked);
-	UE_LOG(LogTemp, Warning, TEXT("Near account balance: %s"), *AccountBalance.StateStaked);
-	UE_LOG(LogTemp, Warning, TEXT("Near account balance: %s"), *AccountBalance.Available);
+	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
+	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Total);
+	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Staked);
+	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.StateStaked);
+	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Available);
 }
 
 void UHttpNearBackManager::GetNearAccountBalance(FString AccountId)
@@ -66,10 +58,10 @@ void UHttpNearBackManager::OnAccountFTBalanceReceivedResponse(FHttpRequestPtr Re
 	
 	const FString Data = Response->GetContentAsString();
 	FJsonObjectConverter::JsonObjectStringToUStruct<FFTBalanceStruct>(Data, &FTBalance);
-	UE_LOG(LogTemp, Warning, TEXT("Near FT TokenName: %s"), *FTBalance.TokenName);
-	UE_LOG(LogTemp, Warning, TEXT("Near FT Symbol: %s"), *FTBalance.Symbol);
-	UE_LOG(LogTemp, Warning, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
-	UE_LOG(LogTemp, Warning, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
+	UE_LOG(LogTemp, Log, TEXT("Near FT TokenName: %s"), *FTBalance.TokenName);
+	UE_LOG(LogTemp, Log, TEXT("Near FT Symbol: %s"), *FTBalance.Symbol);
+	UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
+	UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
 }
 
 void UHttpNearBackManager::GetNearAccountFTBalance(FGetFTBalanceRequestStruct RequestStruct)
@@ -99,7 +91,7 @@ void UHttpNearBackManager::OnNFTMetadataReceivedResponse(FHttpRequestPtr Request
 	
 	const FString Data = Response->GetContentAsString();
 	FJsonObjectConverter::JsonObjectStringToUStruct<FNFTMetadataStruct>(Data, &NFTMetadata);
-	UE_LOG(LogTemp, Warning, TEXT("NFT metadata: %s"), *Data);
+	UE_LOG(LogTemp, Log, TEXT("NFT metadata: %s"), *Data);
 }
 
 void UHttpNearBackManager::GetNFTMetadata(FGetNFTRequestStruct RequestStruct)
