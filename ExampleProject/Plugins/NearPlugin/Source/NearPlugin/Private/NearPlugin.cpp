@@ -7,7 +7,6 @@
 void FNearPluginModule::StartupModule()
 {
 	UE_LOG(LogTemp, Log, TEXT("FNearPluginModule: StartupModule"));
-	NearBackManager = NewObject<UHttpNearBackManager>();
 }
 
 void FNearPluginModule::ShutdownModule()
