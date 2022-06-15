@@ -18,5 +18,5 @@ struct FGetAccountNFTRequestStruct
 	FString FromIndex;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Limit;
+	FString Limit;
 };

@@ -15,11 +15,6 @@ export interface FTBalanceResponse {
   balance: string;
 }
 
-export interface GetFTAccountBalanceRequest {
-  contractId: string;
-  accountId: string;
-}
-
 export interface GetFTTotalBalanceRequest {
   contractId: string;
 }

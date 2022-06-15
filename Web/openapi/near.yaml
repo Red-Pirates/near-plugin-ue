@@ -7,22 +7,36 @@ info:
 tags:
   - name: Account
     description: Operations with near account
-  - name: Fungible token
-    description: Operations with near fungible tokens
-  - name: Non Fungible Token
-    description: Operations with near non fungible tokens
+  - name: Contract
+    description: Operations with contract
 
 servers:
   - url: http://localhost:3000/api/v1
 
 paths:
-  /account/{id}/balance:
+  /account/:
+    post:
+      tags:
+        - Account
+      description: Create new account
+      requestBody:
+        $ref: "#/components/requestBodies/CreateAccountRequest"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateAccountResponse"
+        500:
+          description: Internal Server Error
+  /account/{accountId}/balance:
     get:
       tags:
         - Account
       description: Get account balance
       parameters:
-        - name: id
+        - name: accountId
           in: path
           required: true
           schema:
@@ -33,17 +47,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountBalanceResponce"
+                $ref: "#/components/schemas/AccountBalanceResponse"
         500:
           description: Internal Server Error
-
-  /ft/balance:
-    post:
+  /account/{accountId}/contracts/{contractId}/ft-balance:
+    get:
       tags:
-        - Fungible token
+        - Account
       description: Get the balance of fungible tokens in the account
-      requestBody:
-        $ref: '#/components/requestBodies/GetFTAccountBalanceRequest'
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contractId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: Successful operation
@@ -54,47 +76,32 @@ paths:
         500:
           description: Internal Server Error
 
-  /ft/total-balance:
-    post:
+  /accounts/{accountId}/contracts/{contractId}/nft-list:
+    get:
       tags:
-        - Fungible token
-      description: Get the total balance of fungible tokens
-      requestBody:
-        $ref: '#/components/requestBodies/GetFTTotalBalanceRequest'
-      responses:
-        204:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FTBalanceResponse"
-        500:
-          description: Internal Server Error
-
-  /nft/get:
-    post:
-      tags:
-        - Non Fungible Token
-      description: Get info about non fungible token
-      requestBody:
-        $ref: '#/components/requestBodies/GetTokenRequest'
-      responses:
-        204:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NFTResponse"
-        500:
-          description: Internal Server Error
-
-  /nft/get-many:
-    post:
-      tags:
-        - Non Fungible Token
+        - Account
       description: Get list of nfts
-      requestBody:
-        $ref: '#/components/requestBodies/GetOwnerNFTTokensRequest'
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contractId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fromIndex
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: number
       responses:
         200:
           description: Successful operation
@@ -107,13 +114,22 @@ paths:
         500:
           description: Internal Server Error
 
-  /nft/supply:
-    post:
+  /accounts/{accountId}/contracts/{contractId}/nft-supply:
+    get:
       tags:
-        - Non Fungible Token
+        - Account
       description: Get nft supply for owner
-      requestBody:
-        $ref: '#/components/requestBodies/GetOwnerNFTSupplyRequest'
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contractId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: Successful operation
@@ -124,90 +140,146 @@ paths:
         500:
           description: Internal Server Error
 
+  /contracts/login-url:
+    post:
+      tags:
+        - Contract
+      description: Сreates an access key and generates a URL for authorization in the wallet
+      requestBody:
+        $ref: "#/components/requestBodies/GetLoginUrlRequest"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /contracts/transaction-url:
+    post:
+      tags:
+        - Contract
+      description: Generates a URL to confirm a transaction
+      requestBody:
+        $ref: "#/components/requestBodies/GetTransactionUrlRequest"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /contracts/view:
+    post:
+      tags:
+        - Contract
+      description: Invoke a contract view function
+      requestBody:
+        $ref: "#/components/requestBodies/ViewContractFunctionRequest"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+
+
 components:
   requestBodies:
-    GetFTAccountBalanceRequest:
+    CreateAccountRequest:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/GetFTAccountBalanceRequest"
-      description: Request model for getting the balance of fungible tokens
+            $ref: "#/components/schemas/CreateAccountRequest"
+      description: Request model for create new account
       required: true
 
-    GetFTTotalBalanceRequest:
+    GetLoginUrlRequest:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/GetFTTotalBalanceRequest"
-      description: Request model for getting the total balance of fungible tokens
+            $ref: "#/components/schemas/GetLoginUrlRequest"
+      description: Request model for getting login url
       required: true
 
-    GetOwnerNFTTokensRequest:
+    GetTransactionUrlRequest:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/GetOwnerNFTTokensRequest"
-      description: Request model for getting nfts by owner
+            $ref: "#/components/schemas/GetTransactionUrlRequest"
+      description: Request model for getting transaction signature url
       required: true
 
-    GetTokenRequest:
+    ViewContractFunctionRequest:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/GetTokenRequest"
-      description: Request model for getting info about nft
+            $ref: "#/components/schemas/ViewContractFunctionRequest"
+      description: Request model for invoke view contract function
       required: true
-
-    GetOwnerNFTSupplyRequest:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/GetOwnerNFTSupplyRequest"
-      description: Request model for getting nft sypply by owner
-      required: true
-
 
   schemas:
-    GetFTTotalBalanceRequest:
+
+    CreateAccountRequest:
       type: object
+      required: [ name ]
       properties:
-        contractId:
+        name:
+          type: string
+        amount:
           type: string
 
-    GetFTAccountBalanceRequest:
+    GetLoginUrlRequest:
+      type: object
+      required: [ contractId, successUrl, failureUrl]
+      properties:
+        contractId:
+          type: string
+        successUrl:
+          type: string
+        failureUrl:
+          type: string
+        methods:
+          type: array
+          items:
+            type: string
+
+    GetTransactionUrlRequest:
+      type: object
+      properties:
+        signerId:
+          type: string
+        receiverId:
+          type: string
+        method:
+          type: string
+        params:
+          type: object
+        gas:
+          type: string
+        deposit:
+          type: string
+        callbackUrl:
+          type: string
+
+    ViewContractFunctionRequest:
       type: object
       properties:
         contractId:
           type: string
+        method:
+          type: string
+        params:
+          type: object
+
+    CreateAccountResponse:
+      type: object
+      properties:
         accountId:
           type: string
-
-    GetOwnerNFTTokensRequest:
-      type: object
-      properties:
-        contractId:
-          type: string
-        accountId:
-          type: string
-        fromIndex:
-          type: string
-        limit:
-          type: number
-
-    GetOwnerNFTSupplyRequest:
-      type: object
-      properties:
-        contractId:
-          type: string
-        accountId:
-          type: string
-
-    GetTokenRequest:
-      type: object
-      properties:
-        contractId:
-          type: string
-        tokenId:
+        publicKey:
           type: string
 
     NFTResponse:
@@ -257,7 +329,7 @@ components:
           type: string
 
 
-    AccountBalanceResponce:
+    AccountBalanceResponse:
       type: object
       description: Responce model for the account balance
       properties:

@@ -9,7 +9,4 @@ public:
 
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	UHttpNearBackManager* NearBackManager;
 };

@@ -40,19 +40,10 @@ export const deployContract = async (account: Account, contractFileName: string)
     case 'fungible_token.wasm':
       await account.functionCall({
         contractId: account.accountId,
-        methodName: 'new',
+        methodName: 'new_default_meta',
         args: {
           owner_id: account.accountId,
-          total_supply: '100000000000000000000000000000',
-          metadata: {
-            spec: 'ft-1.0.0',
-            name: 'TestCoin',
-            symbol: 'TC',
-            icon: null,
-            reference: null,
-            reference_hash: null,
-            decimals: 24,
-          },
+          total_supply: '1000000000000000000000000000000000',
         },
         gas: '100000000000000',
         attachedDeposit: '0',

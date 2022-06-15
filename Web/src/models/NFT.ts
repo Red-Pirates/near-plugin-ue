@@ -17,18 +17,6 @@ export interface NFTResponse {
 
 export interface GetTokenRequest {
   tokenId: string;
-  contractId?: string;
-}
-
-export interface GetOwnerNFTTokensRequest {
-  accountId: string;
-  contractId: string;
-  fromIndex: string;
-  limit: number;
-}
-
-export interface GetOwnerNFTTokensSupplyRequest {
-  accountId: string;
   contractId: string;
 }
 
