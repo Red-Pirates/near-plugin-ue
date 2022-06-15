@@ -1,16 +1,15 @@
 ﻿#pragma once
-
 #include "CoreMinimal.h"
-#include "FGetNFTRequestStruct.generated.h"
+#include "FCreateAccountRequestStruct.generated.h"
 
 USTRUCT(BlueprintType)
-struct FGetNFTRequestStruct
+struct FCreateAccountRequestStruct
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString ContractId;
+	FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString TokenId;
+	FString Amount;
 };
