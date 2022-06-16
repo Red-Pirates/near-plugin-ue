@@ -18,23 +18,22 @@ void UHttpNearBackManager::SendAccountBalanceRequest(FString AccountId)
 void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
                                                             bool bWasSuccessful)
 {
-	if (!ResponseIsValid(Response, bWasSuccessful)) return;
 	
-	const FString Data = Response->GetContentAsString();
-	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Total);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Staked);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.StateStaked);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Available);
+	if (!ResponseIsValid(Response, bWasSuccessful)) return;
+	{
+		const FString Data = Response->GetContentAsString();
+		FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
+		UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
+	}
+	OnDAtaReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountFTBalanceRequest(FString AccountId, FString ContractId)
 {
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountBalanceReceivedResponse);
-	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts" + ContractId + "/ft-balance");
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountFTBalanceReceivedResponse);
+	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts/" + ContractId + "/ft-balance");
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }
@@ -43,13 +42,15 @@ void UHttpNearBackManager::OnAccountFTBalanceReceivedResponse(FHttpRequestPtr Re
 	bool bWasSuccessful)
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
-	
-	const FString Data = Response->GetContentAsString();
-	FJsonObjectConverter::JsonObjectStringToUStruct<FFTBalanceStruct>(Data, &FTBalance);
-	UE_LOG(LogTemp, Log, TEXT("Near FT TokenName: %s"), *FTBalance.TokenName);
-	UE_LOG(LogTemp, Log, TEXT("Near FT Symbol: %s"), *FTBalance.Symbol);
-	UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
-	UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
+	{
+		const FString Data = Response->GetContentAsString();
+		FJsonObjectConverter::JsonObjectStringToUStruct<FFTBalanceStruct>(Data, &FTBalance);
+		UE_LOG(LogTemp, Log, TEXT("Near FT TokenName: %s"), *FTBalance.TokenName);
+		UE_LOG(LogTemp, Log, TEXT("Near FT Symbol: %s"), *FTBalance.Symbol);
+		UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
+		UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
+	}
+	OnDAtaReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendCreateAccountRequest(FCreateAccountRequestStruct RequestStruct)
@@ -80,7 +81,7 @@ void UHttpNearBackManager::SendAccountNFTRequest(FGetAccountNFTRequestStruct Req
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountBalanceReceivedResponse);
-	Request->SetURL("http://localhost:3000/api/v1/accounts/" + RequestStruct.AccountId + "/contracts" +
+	Request->SetURL("http://localhost:3000/api/v1/accounts/" + RequestStruct.AccountId + "/contracts/" +
 		RequestStruct.ContractId + "/nft-list?fromIndex=" + RequestStruct.FromIndex + "&limit=" + RequestStruct.Limit);
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
@@ -100,6 +101,7 @@ void UHttpNearBackManager::OnAccountNFTReceivedResponse(FHttpRequestPtr Request,
 		UE_LOG(LogClass, Log, TEXT("Names:  %s "), *AccountNFT.AccountNFTList[b].Description); 
 		UE_LOG(LogClass, Log, TEXT("/n")); 
 	}
+	OnDAtaReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FString ContractId)
