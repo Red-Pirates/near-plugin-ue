@@ -9,7 +9,7 @@
 #include "FCreateAccountRequestStruct.h"
 #include "Interfaces/IHttpRequest.h"
 #include "HttpNearBackManager.generated.h"
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDAtaReceived);
 UCLASS()
 class NEARPLUGIN_API UHttpNearBackManager : public UObject
 {
@@ -30,6 +30,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FString NFTSupply;
+
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FOnDAtaReceived OnDAtaReceived;
 	
 	UFUNCTION(BlueprintCallable)
 	void SendAccountBalanceRequest(FString AccountId);
