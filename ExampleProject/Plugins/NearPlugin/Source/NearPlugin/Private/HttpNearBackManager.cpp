@@ -18,15 +18,14 @@ void UHttpNearBackManager::SendAccountBalanceRequest(FString AccountId)
 void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
                                                             bool bWasSuccessful)
 {
-	if (!ResponseIsValid(Response, bWasSuccessful)) return;
 	
-	const FString Data = Response->GetContentAsString();
-	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Total);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Staked);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.StateStaked);
-	UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *AccountBalance.Available);
+	if (!ResponseIsValid(Response, bWasSuccessful)) return;
+	{
+		const FString Data = Response->GetContentAsString();
+		FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
+		UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
+	}
+	OnDAtaReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountFTBalanceRequest(FString AccountId, FString ContractId)
