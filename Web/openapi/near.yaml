@@ -14,7 +14,7 @@ servers:
   - url: http://localhost:3000/api/v1
 
 paths:
-  /account/:
+  /accounts/:
     post:
       tags:
         - Account
@@ -30,7 +30,7 @@ paths:
                 $ref: "#/components/schemas/CreateAccountResponse"
         500:
           description: Internal Server Error
-  /account/{accountId}/balance:
+  /accounts/{accountId}/balance:
     get:
       tags:
         - Account
@@ -50,7 +50,7 @@ paths:
                 $ref: "#/components/schemas/AccountBalanceResponse"
         500:
           description: Internal Server Error
-  /account/{accountId}/contracts/{contractId}/ft-balance:
+  /accounts/{accountId}/contracts/{contractId}/ft-balance:
     get:
       tags:
         - Account
