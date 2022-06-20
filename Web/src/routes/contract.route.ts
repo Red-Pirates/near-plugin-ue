@@ -7,7 +7,8 @@ import {
 
 const router = express.Router();
 
-router.post('/login-url', getLoginUrl);
+router.get('/:contractId/login-url', getLoginUrl);
+
 router.post('/transaction-url', getTransactionUrl);
 
 router.post('/view', invokeViewFunction);

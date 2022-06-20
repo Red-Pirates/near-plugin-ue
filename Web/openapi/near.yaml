@@ -140,20 +140,27 @@ paths:
         500:
           description: Internal Server Error
 
-  /contracts/login-url:
-    post:
+  /contracts/{contractId}/login-url:
+    get:
       tags:
         - Contract
-      description: Сreates an access key and generates a URL for authorization in the wallet
-      requestBody:
-        $ref: "#/components/requestBodies/GetLoginUrlRequest"
+      description: Creates an access key and generates a URL for authorization in the wallet
+      parameters:
+        - name: contractId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: Successful operation
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                properties: 
+                  loginUrl:
+                    type: string                
 
   /contracts/transaction-url:
     post:

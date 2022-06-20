@@ -2,7 +2,10 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "FAccountBalanceStruct.h"
+#include "FLoginUrlStruct.h"
 #include "FNFTMetadataStruct.h"
+#include "IWebSocket.h"
+#include "WebSocketsModule.h"
 #include "Interfaces/IHttpResponse.h"
 
 void UHttpNearBackManager::SendAccountBalanceRequest(FString AccountId)
@@ -25,7 +28,7 @@ void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Requ
 		FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
 		UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
 	}
-	OnDAtaReceived.Broadcast();
+	OnAccountBalanceReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountFTBalanceRequest(FString AccountId, FString ContractId)
@@ -50,7 +53,7 @@ void UHttpNearBackManager::OnAccountFTBalanceReceivedResponse(FHttpRequestPtr Re
 		UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
 		UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
 	}
-	OnDAtaReceived.Broadcast();
+	OnFTBalanceReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendCreateAccountRequest(FCreateAccountRequestStruct RequestStruct)
@@ -101,7 +104,6 @@ void UHttpNearBackManager::OnAccountNFTReceivedResponse(FHttpRequestPtr Request,
 		UE_LOG(LogClass, Log, TEXT("Names:  %s "), *AccountNFT.AccountNFTList[b].Description); 
 		UE_LOG(LogClass, Log, TEXT("/n")); 
 	}
-	OnDAtaReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FString ContractId)
@@ -109,7 +111,7 @@ void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FStrin
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountBalanceReceivedResponse);
-	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts" + ContractId + "/nft-supply");
+	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts/" + ContractId + "/nft-supply");
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }
@@ -120,6 +122,56 @@ void UHttpNearBackManager::OnAccountNFTSupplyReceivedResponse(FHttpRequestPtr Re
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
 	NFTSupply = Response->GetContentAsString();
 	UE_LOG(LogClass, Log, TEXT("NFT supply:  %s "), *NFTSupply);
+}
+
+void UHttpNearBackManager::Login(FString ContractId)
+{
+	FHttpModule* Module = &FHttpModule::Get();
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnLoginReceivedResponse);
+	Request->SetURL("http://localhost:3000/api/v1/contracts/" + ContractId + "/login-url");
+	Request->SetVerb("GET");
+	Request->ProcessRequest();
+}
+
+ void UHttpNearBackManager::OnLoginReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+	bool bWasSuccessful)
+{
+	if (!ResponseIsValid(Response, bWasSuccessful)) return;
+	const FString Data = Response->GetContentAsString();
+	UE_LOG(LogClass, Log, TEXT("LoginUrl:  %s "), *Data);
+
+	FLoginUrlStruct DataStruct;
+	FJsonObjectConverter::JsonObjectStringToUStruct<FLoginUrlStruct>(Data, &DataStruct);
+
+	FPlatformProcess::LaunchURL( *DataStruct.LoginUrl, nullptr, nullptr);
+	
+	const FString ServerURL = TEXT("ws://localhost:5000");
+	const FString ServerProtocol = TEXT("ws"); 
+    
+	TSharedRef<IWebSocket> Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
+    
+	Socket->OnConnected().AddLambda([Socket]() {
+		UE_LOG(LogTemp, Log, TEXT("Connected to websocket server."));
+		Socket->Send("{\"event\": \"test\", \"data\": \"test message data\"}");
+	});
+    
+	Socket->OnConnectionError().AddLambda([](const FString& Error) {
+		UE_LOG(LogTemp, Log, TEXT("Failed to connect to websocket server with error: \"%s\"."), *Error);
+	});
+    
+	Socket->OnMessage().AddLambda([&](const FString& Message) {
+		UE_LOG(LogTemp, Log, TEXT("Received message from websocket server: \"%s\"."), *Message);
+		UserAccountId = Message;
+		UE_LOG(LogTemp, Log, TEXT("User Account Id: \"%s\"."), *UserAccountId);
+		OnUserAccountIdReceived.Broadcast();
+	});
+    
+	Socket->OnClosed().AddLambda([&](int32 StatusCode, const FString& Reason, bool bWasClean) {
+		UE_LOG(LogTemp, Log, TEXT("Connection to websocket server has been closed with status code: \"%d\" and reason: \"%s\"."), StatusCode, *Reason);
+	});
+    
+	Socket->Connect();
 }
 
 bool UHttpNearBackManager::ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful) {

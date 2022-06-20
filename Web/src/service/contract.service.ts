@@ -56,26 +56,16 @@ class ContractService {
     return newUrl.href;
   };
 
-  createLoginWalletUrl = async (
-    contractId: string,
-    successUrl: string,
-    failureUrl: string,
-    methodNames?: string[],
-  ) => {
+  createLoginWalletUrl = async (contractId: string) => {
     const newUrl = new URL(`https://wallet.${config.NETWORK_ID}.near.org` + '/login/');
     const accessKey = KeyPair.fromRandom('ed25519');
 
-    newUrl.searchParams.set('success_url', successUrl);
-    newUrl.searchParams.set('failure_url', failureUrl);
+    newUrl.searchParams.set('success_url', 'http://localhost:3000/api/v1/login/success');
+    newUrl.searchParams.set('failure_url', 'http://localhost:3000/api/v1/login/failure');
     newUrl.searchParams.set('contract_id', contractId);
     newUrl.searchParams.set('public_key', accessKey.getPublicKey().toString());
 
-    if (methodNames) {
-      methodNames.forEach((methodName) => {
-        newUrl.searchParams.append('methodNames', methodName);
-      });
-    }
-    return newUrl.toString();
+    return { loginUrl: newUrl.toString() };
   };
 }
 
