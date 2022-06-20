@@ -1,17 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { contractService } from '../service/contract.service';
+import { loginService } from '../service/login.service';
 
 interface InvokeViewFunctionBody {
   contractId: string;
   method: string;
   params: Record<string, any>;
-}
-
-interface GetLoginUrlBody {
-  contractId: string;
-  successUrl: string;
-  failureUrl: string;
-  methods?: string[];
 }
 
 interface GetTransactionSignInUrlBody {
@@ -22,6 +16,10 @@ interface GetTransactionSignInUrlBody {
   gas: string;
   deposit: string;
   callbackUrl: string;
+}
+
+interface GetLoginUrlParams {
+  contractId: string;
 }
 
 export const invokeViewFunction = (
@@ -36,17 +34,12 @@ export const invokeViewFunction = (
 };
 
 export const getLoginUrl = (
-  req: Request<never, never, GetLoginUrlBody>,
+  req: Request<GetLoginUrlParams>,
   res: Response,
   next: NextFunction,
 ): void => {
   contractService
-    .createLoginWalletUrl(
-      req.body.contractId,
-      req.body.successUrl,
-      req.body.failureUrl,
-      req.body.methods,
-    )
+    .createLoginWalletUrl(req.params.contractId)
     .then((result) => res.json(result))
     .catch(next);
 };

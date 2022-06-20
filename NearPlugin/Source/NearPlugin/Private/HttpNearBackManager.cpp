@@ -2,7 +2,10 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "FAccountBalanceStruct.h"
+#include "FLoginUrlStruct.h"
 #include "FNFTMetadataStruct.h"
+#include "IWebSocket.h"
+#include "WebSocketsModule.h"
 #include "Interfaces/IHttpResponse.h"
 
 void UHttpNearBackManager::SendAccountBalanceRequest(FString AccountId)
@@ -25,7 +28,7 @@ void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Requ
 		FJsonObjectConverter::JsonObjectStringToUStruct<FAccountBalanceStruct>(Data, &AccountBalance);
 		UE_LOG(LogTemp, Log, TEXT("Near account balance: %s"), *Data);
 	}
-	OnDAtaReceived.Broadcast();
+	OnAccountBalanceReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountFTBalanceRequest(FString AccountId, FString ContractId)
@@ -50,7 +53,7 @@ void UHttpNearBackManager::OnAccountFTBalanceReceivedResponse(FHttpRequestPtr Re
 		UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
 		UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
 	}
-	OnDAtaReceived.Broadcast();
+	OnFTBalanceReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendCreateAccountRequest(FCreateAccountRequestStruct RequestStruct)
@@ -101,7 +104,6 @@ void UHttpNearBackManager::OnAccountNFTReceivedResponse(FHttpRequestPtr Request,
 		UE_LOG(LogClass, Log, TEXT("Names:  %s "), *AccountNFT.AccountNFTList[b].Description); 
 		UE_LOG(LogClass, Log, TEXT("/n")); 
 	}
-	OnDAtaReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FString ContractId)
@@ -109,7 +111,7 @@ void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FStrin
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountBalanceReceivedResponse);
-	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts" + ContractId + "/nft-supply");
+	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts/" + ContractId + "/nft-supply");
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }
@@ -122,11 +124,9 @@ void UHttpNearBackManager::OnAccountNFTSupplyReceivedResponse(FHttpRequestPtr Re
 	UE_LOG(LogClass, Log, TEXT("NFT supply:  %s "), *NFTSupply);
 }
 
-bool UHttpNearBackManager::ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful) {
-	if (EHttpResponseCodes::IsOk(Response->GetResponseCode())) {
-		return true;
-	} else {
-	    UE_LOG(LogTemp, Warning, TEXT("Http Response returned error code: %d"), Response->GetResponseCode());
-    	return false;
-	}
-}
+void UHttpNearBackManager::Login(FString ContractId)
+{
+	FHttpModule* Module = &FHttpModule::Get();
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnLoginReceivedResponse);
+	Request->SetURL("http://localhost:3000/api/v1/contracts/" + ContractId + "/login-url");
