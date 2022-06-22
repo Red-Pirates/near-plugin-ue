@@ -46,7 +46,7 @@ class UserAccountService {
         limit: Number(limit),
       },
     );
-    return tokens.map((token) => this.castNearNFTStructToResponse(token));
+    return { accountNFTList: tokens.map((token) => this.castNearNFTStructToResponse(token)) };
   };
 
   getNFTSupply = async (accountId: string, contractId: string) => {

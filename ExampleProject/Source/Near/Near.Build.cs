@@ -8,7 +8,7 @@ public class Near : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NearPlugin" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NearPlugin", "ApplicationCore"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 	}

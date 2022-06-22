@@ -24,10 +24,10 @@ struct FNFTMetadataStruct
     FString Media;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 Copies;
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString MediaHash;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Copies;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 IssuedAt;
