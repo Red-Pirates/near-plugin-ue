@@ -21,7 +21,7 @@ void UHttpNearBackManager::SendAccountBalanceRequest(FString AccountId)
 void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
                                                             bool bWasSuccessful)
 {
-	
+
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
 	{
 		const FString Data = Response->GetContentAsString();
@@ -74,7 +74,7 @@ void UHttpNearBackManager::OnCreateAccountReceivedResponse(FHttpRequestPtr Reque
 	bool bWasSuccessful)
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
-	
+
 	const FString Data = Response->GetContentAsString();
 	UE_LOG(LogTemp, Log, TEXT("New near account created: %s"), *Data);
 }
@@ -83,7 +83,7 @@ void UHttpNearBackManager::SendAccountNFTRequest(FGetAccountNFTRequestStruct Req
 {
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountBalanceReceivedResponse);
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountNFTReceivedResponse);
 	Request->SetURL("http://localhost:3000/api/v1/accounts/" + RequestStruct.AccountId + "/contracts/" +
 		RequestStruct.ContractId + "/nft-list?fromIndex=" + RequestStruct.FromIndex + "&limit=" + RequestStruct.Limit);
 	Request->SetVerb("GET");
@@ -94,16 +94,19 @@ void UHttpNearBackManager::OnAccountNFTReceivedResponse(FHttpRequestPtr Request,
 	bool bWasSuccessful)
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
-	
+
 	const FString Data = Response->GetContentAsString();
-	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountNFTStruct>(Data, &AccountNFT);
+	UE_LOG(LogClass, Log, TEXT("OnAccountNFTReceivedResponse:  %s "), *Data);
+	FNFTMetadataStruct TestStruct;
+	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountNFTStruct>(*Data, &AccountNFT);
 	for (int32 b = 0; b < AccountNFT.AccountNFTList.Num(); b++)
 	{
-		UE_LOG(LogClass, Log, TEXT("Names:  %s "), *AccountNFT.AccountNFTList[b].Title); 
-		UE_LOG(LogClass, Log, TEXT("Names:  %s "), *AccountNFT.AccountNFTList[b].Media); 
-		UE_LOG(LogClass, Log, TEXT("Names:  %s "), *AccountNFT.AccountNFTList[b].Description); 
-		UE_LOG(LogClass, Log, TEXT("/n")); 
+		UE_LOG(LogClass, Log, TEXT("Title:  %s "), *AccountNFT.AccountNFTList[b].Title);
+		UE_LOG(LogClass, Log, TEXT("Media:  %s "), *AccountNFT.AccountNFTList[b].Media);
+		UE_LOG(LogClass, Log, TEXT("Description:  %s "), *AccountNFT.AccountNFTList[b].Description);
+		UE_LOG(LogClass, Log, TEXT("/n"));
 	}
+	OnAccountNFTReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FString ContractId)
@@ -145,32 +148,32 @@ void UHttpNearBackManager::Login(FString ContractId)
 	FJsonObjectConverter::JsonObjectStringToUStruct<FLoginUrlStruct>(Data, &DataStruct);
 
 	FPlatformProcess::LaunchURL( *DataStruct.LoginUrl, nullptr, nullptr);
-	
+
 	const FString ServerURL = TEXT("ws://localhost:5000");
-	const FString ServerProtocol = TEXT("ws"); 
-    
+	const FString ServerProtocol = TEXT("ws");
+
 	TSharedRef<IWebSocket> Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
-    
+
 	Socket->OnConnected().AddLambda([Socket]() {
 		UE_LOG(LogTemp, Log, TEXT("Connected to websocket server."));
 		Socket->Send("{\"event\": \"test\", \"data\": \"test message data\"}");
 	});
-    
+
 	Socket->OnConnectionError().AddLambda([](const FString& Error) {
 		UE_LOG(LogTemp, Log, TEXT("Failed to connect to websocket server with error: \"%s\"."), *Error);
 	});
-    
+
 	Socket->OnMessage().AddLambda([&](const FString& Message) {
 		UE_LOG(LogTemp, Log, TEXT("Received message from websocket server: \"%s\"."), *Message);
 		UserAccountId = Message;
 		UE_LOG(LogTemp, Log, TEXT("User Account Id: \"%s\"."), *UserAccountId);
 		OnUserAccountIdReceived.Broadcast();
 	});
-    
+
 	Socket->OnClosed().AddLambda([&](int32 StatusCode, const FString& Reason, bool bWasClean) {
 		UE_LOG(LogTemp, Log, TEXT("Connection to websocket server has been closed with status code: \"%d\" and reason: \"%s\"."), StatusCode, *Reason);
 	});
-    
+
 	Socket->Connect();
 }
 

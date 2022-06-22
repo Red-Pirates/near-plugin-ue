@@ -20,7 +20,7 @@ class NEARPLUGIN_API UHttpNearBackManager : public UObject
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FString UserAccountId;
-	
+
     UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FAccountBalanceStruct AccountBalance;
 	
@@ -44,6 +44,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnUserAccountIdReceived;
+
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FOnDAtaReceived OnAccountNFTReceived;
 	
 	UFUNCTION(BlueprintCallable)
 	void SendAccountBalanceRequest(FString AccountId);
@@ -74,10 +77,9 @@ public:
 	void Login(FString ContractId);
 
 	void OnLoginReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	
+
 private:
 	static bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful);
 };
-
 
 
