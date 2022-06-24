@@ -26,7 +26,7 @@ public class NearPlugin : ModuleRules
 				"Core",
 				"Json",
                 "JsonUtilities",
-                "HTTP"
+                "HTTP",
                 "WebSockets"
 			}
 			);

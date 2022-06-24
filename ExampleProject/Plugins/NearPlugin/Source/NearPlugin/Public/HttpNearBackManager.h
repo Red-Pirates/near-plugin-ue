@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "FAccountBalanceStruct.h"
-#include "FFTBalanceStruct.h"
-#include "FNFTMetadataStruct.h"
+#include "FFtBalanceStruct.h"
+#include "FNftMetadataStruct.h"
 #include "FGetAccountNFTRequestStruct.h"
-#include "FAccountNFTStruct.h"
+#include "FAccountNftStruct.h"
+#include "FNftSupplyStruct.h"
 #include "FCreateAccountRequestStruct.h"
 #include "Interfaces/IHttpRequest.h"
 #include "HttpNearBackManager.generated.h"
@@ -25,28 +26,31 @@ public:
 	FAccountBalanceStruct AccountBalance;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-    FFTBalanceStruct FTBalance;
+    FFtBalanceStruct FtBalance;
     
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	FNFTMetadataStruct NFTMetadata;
+	FNftMetadataStruct NftMetadata;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	FAccountNFTStruct AccountNFT;
+	FAccountNftStruct AccountNFT;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	FString NFTSupply;
+	FNftSupplyStruct NftSupply;
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnAccountBalanceReceived;
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
-	FOnDAtaReceived OnFTBalanceReceived;
+	FOnDAtaReceived OnFtBalanceReceived;
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnUserAccountIdReceived;
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
-	FOnDAtaReceived OnAccountNFTReceived;
+	FOnDAtaReceived OnAccountNftReceived;
+
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FOnDAtaReceived OnNftSupplyReceived;
 	
 	UFUNCTION(BlueprintCallable)
 	void SendAccountBalanceRequest(FString AccountId);
@@ -54,9 +58,9 @@ public:
 	void OnAccountBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	UFUNCTION(BlueprintCallable)
-	void SendAccountFTBalanceRequest(FString AccountId, FString ContractId);
+	void SendAccountFtBalanceRequest(FString AccountId, FString ContractId);
     
-    void OnAccountFTBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+    void OnAccountFtBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	UFUNCTION(BlueprintCallable)
 	void SendCreateAccountRequest(FCreateAccountRequestStruct RequestStruct);
@@ -64,14 +68,14 @@ public:
 	void OnCreateAccountReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
 	UFUNCTION(BlueprintCallable)
-	void SendAccountNFTRequest(FGetAccountNFTRequestStruct RequestStruct);
+	void SendAccountNftRequest(FGetAccountNftRequestStruct RequestStruct);
 
-	void OnAccountNFTReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void OnAccountNftReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	UFUNCTION(BlueprintCallable)
-	void SendAccountNFTSupplyRequest(FString AccountId, FString ContractId);
+	void SendAccountNftSupplyRequest(FString AccountId, FString ContractId);
 
-	void OnAccountNFTSupplyReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void OnAccountNftSupplyReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
 	UFUNCTION(BlueprintCallable)
 	void Login(FString ContractId);

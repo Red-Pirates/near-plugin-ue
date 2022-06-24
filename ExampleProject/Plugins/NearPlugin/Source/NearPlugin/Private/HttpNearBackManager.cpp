@@ -3,7 +3,7 @@
 #include "JsonObjectConverter.h"
 #include "FAccountBalanceStruct.h"
 #include "FLoginUrlStruct.h"
-#include "FNFTMetadataStruct.h"
+#include "FNftMetadataStruct.h"
 #include "IWebSocket.h"
 #include "WebSocketsModule.h"
 #include "Interfaces/IHttpResponse.h"
@@ -31,29 +31,28 @@ void UHttpNearBackManager::OnAccountBalanceReceivedResponse(FHttpRequestPtr Requ
 	OnAccountBalanceReceived.Broadcast();
 }
 
-void UHttpNearBackManager::SendAccountFTBalanceRequest(FString AccountId, FString ContractId)
+void UHttpNearBackManager::SendAccountFtBalanceRequest(FString AccountId, FString ContractId)
 {
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountFTBalanceReceivedResponse);
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountFtBalanceReceivedResponse);
 	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts/" + ContractId + "/ft-balance");
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }
 
-void UHttpNearBackManager::OnAccountFTBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+void UHttpNearBackManager::OnAccountFtBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
 	bool bWasSuccessful)
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
-	{
-		const FString Data = Response->GetContentAsString();
-		FJsonObjectConverter::JsonObjectStringToUStruct<FFTBalanceStruct>(Data, &FTBalance);
-		UE_LOG(LogTemp, Log, TEXT("Near FT TokenName: %s"), *FTBalance.TokenName);
-		UE_LOG(LogTemp, Log, TEXT("Near FT Symbol: %s"), *FTBalance.Symbol);
-		UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FTBalance.Icon);
-		UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FTBalance.Balance);
-	}
-	OnFTBalanceReceived.Broadcast();
+
+	const FString Data = Response->GetContentAsString();
+	FJsonObjectConverter::JsonObjectStringToUStruct<FFtBalanceStruct>(Data, &FtBalance);
+	UE_LOG(LogTemp, Log, TEXT("Near FT TokenName: %s"), *FtBalance.TokenName);
+	UE_LOG(LogTemp, Log, TEXT("Near FT Symbol: %s"), *FtBalance.Symbol);
+	UE_LOG(LogTemp, Log, TEXT("Near FT Icon: %s"), *FtBalance.Icon);
+	UE_LOG(LogTemp, Log, TEXT("Near FT Balance: %s"), *FtBalance.Balance);
+	OnFtBalanceReceived.Broadcast();
 }
 
 void UHttpNearBackManager::SendCreateAccountRequest(FCreateAccountRequestStruct RequestStruct)
@@ -79,26 +78,24 @@ void UHttpNearBackManager::OnCreateAccountReceivedResponse(FHttpRequestPtr Reque
 	UE_LOG(LogTemp, Log, TEXT("New near account created: %s"), *Data);
 }
 
-void UHttpNearBackManager::SendAccountNFTRequest(FGetAccountNFTRequestStruct RequestStruct)
+void UHttpNearBackManager::SendAccountNftRequest(FGetAccountNftRequestStruct RequestStruct)
 {
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountNFTReceivedResponse);
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountNftReceivedResponse);
 	Request->SetURL("http://localhost:3000/api/v1/accounts/" + RequestStruct.AccountId + "/contracts/" +
 		RequestStruct.ContractId + "/nft-list?fromIndex=" + RequestStruct.FromIndex + "&limit=" + RequestStruct.Limit);
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }
 
-void UHttpNearBackManager::OnAccountNFTReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+void UHttpNearBackManager::OnAccountNftReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
 	bool bWasSuccessful)
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
 
 	const FString Data = Response->GetContentAsString();
-	UE_LOG(LogClass, Log, TEXT("OnAccountNFTReceivedResponse:  %s "), *Data);
-	FNFTMetadataStruct TestStruct;
-	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountNFTStruct>(*Data, &AccountNFT);
+	FJsonObjectConverter::JsonObjectStringToUStruct<FAccountNftStruct>(*Data, &AccountNFT);
 	for (int32 b = 0; b < AccountNFT.AccountNFTList.Num(); b++)
 	{
 		UE_LOG(LogClass, Log, TEXT("Title:  %s "), *AccountNFT.AccountNFTList[b].Title);
@@ -106,25 +103,27 @@ void UHttpNearBackManager::OnAccountNFTReceivedResponse(FHttpRequestPtr Request,
 		UE_LOG(LogClass, Log, TEXT("Description:  %s "), *AccountNFT.AccountNFTList[b].Description);
 		UE_LOG(LogClass, Log, TEXT("/n"));
 	}
-	OnAccountNFTReceived.Broadcast();
+	OnAccountNftReceived.Broadcast();
 }
 
-void UHttpNearBackManager::SendAccountNFTSupplyRequest(FString AccountId, FString ContractId)
+void UHttpNearBackManager::SendAccountNftSupplyRequest(FString AccountId, FString ContractId)
 {
 	FHttpModule* Module = &FHttpModule::Get();
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountBalanceReceivedResponse);
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnAccountNftSupplyReceivedResponse);
 	Request->SetURL("http://localhost:3000/api/v1/accounts/" + AccountId + "/contracts/" + ContractId + "/nft-supply");
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }
 
-void UHttpNearBackManager::OnAccountNFTSupplyReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+void UHttpNearBackManager::OnAccountNftSupplyReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
 	bool bWasSuccessful)
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
-	NFTSupply = Response->GetContentAsString();
-	UE_LOG(LogClass, Log, TEXT("NFT supply:  %s "), *NFTSupply);
+	const FString Data = Response->GetContentAsString();
+	FJsonObjectConverter::JsonObjectStringToUStruct<FNftSupplyStruct>(*Data, &NftSupply);
+	UE_LOG(LogClass, Log, TEXT("NFT supply:  %s "), *NftSupply.NftSupply);
+	OnNftSupplyReceived.Broadcast();
 }
 
 void UHttpNearBackManager::Login(FString ContractId)
@@ -156,7 +155,6 @@ void UHttpNearBackManager::Login(FString ContractId)
 
 	Socket->OnConnected().AddLambda([Socket]() {
 		UE_LOG(LogTemp, Log, TEXT("Connected to websocket server."));
-		Socket->Send("{\"event\": \"test\", \"data\": \"test message data\"}");
 	});
 
 	Socket->OnConnectionError().AddLambda([](const FString& Error) {
