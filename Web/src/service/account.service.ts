@@ -50,9 +50,12 @@ class UserAccountService {
   };
 
   getNFTSupply = async (accountId: string, contractId: string) => {
-    return await blockchain.masterAccount.viewFunction(contractId, 'nft_supply_for_owner', {
-      account_id: accountId,
-    });
+    const nftSupply = await blockchain.masterAccount.viewFunction(
+      contractId,
+      'nft_supply_for_owner',
+      { account_id: accountId },
+    );
+    return { nftSupply };
   };
 
   getFTBalance = async (accountId: string, contractId: string): Promise<FTBalanceResponse> => {
