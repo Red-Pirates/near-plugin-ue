@@ -1,37 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { userAccountService } from '../service/account.service';
 
-interface GetAccountBalanceParams {
+interface AccountParams {
   accountId: string;
-}
-
-interface CreateAccountBody {
-  name: string;
-  amount?: string;
-}
-
-export interface GetFTAccountBalanceParams {
-  contractId: string;
-  accountId: string;
-}
-
-export interface GetOwnerNFTTokensParams {
-  accountId: string;
-  contractId: string;
-}
-
-export interface GetOwnerNFTTokensQuery {
-  fromIndex: string;
-  limit: number;
-}
-
-export interface GetOwnerNFTTokensSupplyParams {
-  accountId: string;
-  contractId: string;
 }
 
 export const getAccountBalance = (
-  req: Request<GetAccountBalanceParams>,
+  req: Request<AccountParams>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -40,6 +15,33 @@ export const getAccountBalance = (
     .then((balance) => res.json(balance))
     .catch(next);
 };
+
+export const getAccountState = (
+  req: Request<AccountParams>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  userAccountService
+    .getAccountState(req.params.accountId)
+    .then((state) => res.json(state))
+    .catch(next);
+};
+
+export const getAccountDetails = (
+  req: Request<AccountParams>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  userAccountService
+    .getAccountDetails(req.params.accountId)
+    .then((details) => res.json(details))
+    .catch(next);
+};
+
+interface CreateAccountBody {
+  name: string;
+  amount?: string;
+}
 
 export const createAccount = (
   req: Request<never, never, CreateAccountBody>,
@@ -52,35 +54,17 @@ export const createAccount = (
     .catch(next);
 };
 
-export const getNFTTokens = (
-  req: Request<GetOwnerNFTTokensParams, never, never, GetOwnerNFTTokensQuery>,
-  res: Response,
-  next: NextFunction,
-): void => {
-  userAccountService
-    .getNFTTokens(req.params.accountId, req.params.contractId, req.query.fromIndex, req.query.limit)
-    .then((jsonTokens) => res.json(jsonTokens))
-    .catch(next);
-};
+interface TransactionParams extends AccountParams {
+  txHash: string;
+}
 
-export const getNFTSupply = (
-  req: Request<GetOwnerNFTTokensSupplyParams>,
+export const getTransactionStatus = (
+  req: Request<TransactionParams>,
   res: Response,
   next: NextFunction,
 ): void => {
   userAccountService
-    .getNFTSupply(req.params.accountId, req.params.contractId)
-    .then((supply) => res.json(supply))
-    .catch(next);
-};
-
-export const getFTAccountBalance = (
-  req: Request<GetFTAccountBalanceParams>,
-  res: Response,
-  next: NextFunction,
-): void => {
-  userAccountService
-    .getFTBalance(req.params.accountId, req.params.contractId)
-    .then((balance) => res.json(balance))
+    .geTransactionStatus(req.params.accountId, req.params.txHash)
+    .then((result) => res.json(result))
     .catch(next);
 };

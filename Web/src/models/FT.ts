@@ -1,20 +1,17 @@
-export interface NearFTMetadata {
+export interface FtMetadata {
   spec: string;
   name: string;
   symbol: string;
   icon: string | null;
   reference: string | null;
-  reference_hash: string | null;
+  referenceHash: string | null;
   decimals: number;
 }
 
-export interface FTBalanceResponse {
-  tokenName: string;
-  symbol: string;
-  icon: string | null;
+export interface FtBalanceResponse {
   balance: string;
 }
 
-export interface GetFTTotalBalanceRequest {
-  contractId: string;
+export interface FtTotalSupplyResponse {
+  totalSupply: string;
 }

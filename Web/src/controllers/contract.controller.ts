@@ -1,29 +1,32 @@
 import { NextFunction, Request, Response } from 'express';
 import { contractService } from '../service/contract.service';
-import { loginService } from '../service/login.service';
 
-interface InvokeViewFunctionBody {
+interface ContractParams {
   contractId: string;
-  method: string;
-  params: Record<string, any>;
 }
 
-interface GetTransactionSignInUrlBody {
-  signerId: string;
-  receiverId: string;
-  method: string;
-  params: Record<string, any>;
-  gas: string;
-  deposit: string;
-  callbackUrl: string;
+interface DeployContractBody {
+  fileName: string;
 }
 
-interface GetLoginUrlParams {
-  contractId: string;
+export const deployContract = (
+  req: Request<never, never, DeployContractBody>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  contractService
+    .deployContract(req.body.fileName)
+    .then(() => res.sendStatus(204))
+    .catch(next);
+};
+
+interface ViewFunctionBody extends ContractParams {
+  method: string;
+  params: Record<string, any>;
 }
 
 export const invokeViewFunction = (
-  req: Request<never, never, InvokeViewFunctionBody>,
+  req: Request<never, never, ViewFunctionBody>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -34,7 +37,7 @@ export const invokeViewFunction = (
 };
 
 export const getLoginUrl = (
-  req: Request<GetLoginUrlParams>,
+  req: Request<ContractParams>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -44,8 +47,18 @@ export const getLoginUrl = (
     .catch(next);
 };
 
+interface TransactionUrlBody {
+  signerId: string;
+  receiverId: string;
+  method: string;
+  params: Record<string, any>;
+  gas: string;
+  deposit: string;
+  callbackUrl: string;
+}
+
 export const getTransactionUrl = (
-  req: Request<never, never, GetTransactionSignInUrlBody>,
+  req: Request<never, never, TransactionUrlBody>,
   res: Response,
   next: NextFunction,
 ): void => {

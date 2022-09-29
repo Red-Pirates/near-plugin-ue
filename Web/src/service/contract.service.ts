@@ -1,8 +1,16 @@
 import { Account, KeyPair, providers, transactions, utils } from 'near-api-js';
-import { near } from '../utils/blockchain';
+import { masterAccount, near } from '../utils/blockchain';
 import config from '../config';
+import fs from 'fs';
 
 class ContractService {
+  deployContract = async (contractFileName: string) => {
+    const path = `contracts/${contractFileName}`;
+    if (!fs.existsSync(path)) new Error('Contract not found');
+    const data = [...fs.readFileSync(path)];
+    await masterAccount.deployContract(new Uint8Array(data));
+  };
+
   invokeViewFunction = async (
     contractId: string,
     method: string,
@@ -53,7 +61,7 @@ class ContractService {
 
     newUrl.searchParams.set('callbackUrl', callbackUrl);
 
-    return newUrl.href;
+    return { transactionUrl: newUrl.href };
   };
 
   createLoginWalletUrl = async (contractId: string) => {
