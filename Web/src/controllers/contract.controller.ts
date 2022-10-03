@@ -31,7 +31,31 @@ export const invokeViewFunction = (
   next: NextFunction,
 ): void => {
   contractService
-    .invokeViewFunction(req.body.contractId, req.body.method, req.body.params)
+    .callViewContractFunction(req.body.contractId, req.body.method, req.body.params)
+    .then((result) => res.json(result))
+    .catch(next);
+};
+
+interface CallFunctionBody extends ContractParams {
+  method: string;
+  params: Record<string, any>;
+  attachedGas?: string;
+  attachedTokens?: string;
+}
+
+export const callContractFunction = (
+  req: Request<never, never, CallFunctionBody>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  contractService
+    .callCallContractFunction(
+      req.body.contractId,
+      req.body.method,
+      req.body.params,
+      req.body.attachedGas,
+      req.body.attachedTokens,
+    )
     .then((result) => res.json(result))
     .catch(next);
 };

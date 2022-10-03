@@ -1,5 +1,5 @@
-import { Account, KeyPair, providers, transactions, utils } from 'near-api-js';
-import { masterAccount, near } from '../utils/blockchain';
+import { KeyPair, providers, transactions, utils } from 'near-api-js';
+import { masterAccount } from '../utils/blockchain';
 import config from '../config';
 import fs from 'fs';
 
@@ -11,13 +11,28 @@ class ContractService {
     await masterAccount.deployContract(new Uint8Array(data));
   };
 
-  invokeViewFunction = async (
+  callCallContractFunction = async (
+    contractId: string,
+    method: string,
+    params: Record<string, any>,
+    attachedGas?: string,
+    attachedTokens?: string,
+  ) => {
+    return await masterAccount.functionCall({
+      contractId: contractId,
+      methodName: method,
+      args: params,
+      gas: attachedGas,
+      attachedDeposit: attachedTokens,
+    });
+  };
+
+  callViewContractFunction = async (
     contractId: string,
     method: string,
     params: Record<string, any>,
   ): Promise<any> => {
-    const account = new Account(near.connection, contractId);
-    return await account.viewFunction(contractId, method, params);
+    return await masterAccount.viewFunction(contractId, method, params);
   };
 
   createTransactionSignUrl = async (
