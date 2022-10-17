@@ -20,12 +20,17 @@ class UserAccountService {
   getAccountState = async (accountId: string) => {
     const account = await blockchain.near.account(accountId);
     const state = await account.state();
+    state.amount = formatNearAmount(state.amount);
     return keysToCamel(state);
   };
 
   getAccountDetails = async (accountId: string) => {
     const account = await blockchain.near.account(accountId);
-    return account.getAccountDetails();
+    const details = await account.getAccountDetails();
+    details.authorizedApps = details.authorizedApps.map((t) => {
+      return { ...t, amount: formatNearAmount(t.amount) };
+    });
+    return details;
   };
 
   createAccount = async (name: string, amount?: string) => {

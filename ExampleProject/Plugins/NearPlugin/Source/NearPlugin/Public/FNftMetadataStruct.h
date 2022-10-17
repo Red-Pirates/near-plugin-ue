@@ -8,12 +8,6 @@ struct FNftMetadataStruct
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString TokenId;
-	
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FString OwnerId;
-    
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Title;
     

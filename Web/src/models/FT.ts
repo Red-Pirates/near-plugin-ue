@@ -11,7 +11,3 @@ export interface FtMetadata {
 export interface FtBalanceResponse {
   balance: string;
 }
-
-export interface FtTotalSupplyResponse {
-  totalSupply: string;
-}

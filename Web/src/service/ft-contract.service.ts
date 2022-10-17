@@ -1,17 +1,16 @@
-import { FtBalanceResponse, FtMetadata, FtTotalSupplyResponse } from '../models/FT';
+import { FtBalanceResponse, FtMetadata } from '../models/FT';
 import * as blockchain from '../utils/blockchain';
 import { formatNearAmount } from 'near-api-js/lib/utils/format';
 import { keysToCamel } from '../utils/snakeToCamelCase';
 
 class FtContractService {
-  getFtTotalSupply = async (contractId: string): Promise<FtTotalSupplyResponse> => {
-    console.log(contractId);
+  getFtTotalSupply = async (contractId: string): Promise<FtBalanceResponse> => {
     const totalSupply = await blockchain.masterAccount.viewFunction(
       contractId,
       'ft_total_supply',
       {},
     );
-    return { totalSupply: formatNearAmount(totalSupply) };
+    return { balance: formatNearAmount(totalSupply) };
   };
 
   getFtBalance = async (accountId: string, contractId: string): Promise<FtBalanceResponse> => {

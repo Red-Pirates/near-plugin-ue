@@ -1,10 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "FFtBalanceStruct.generated.h"
+#include "FFtTotalSupplyStruct.generated.h"
 
 USTRUCT(BlueprintType)
-struct FFtBalanceStruct
+struct FFtTotalSupplyStruct
 {
 	GENERATED_BODY()
 

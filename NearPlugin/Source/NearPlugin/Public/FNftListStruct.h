@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "FNftTokenStruct.h"
-#include "FAccountNftStruct.generated.h"
+#include "FNftListStruct.generated.h"
 
 USTRUCT(BlueprintType)
-struct FAccountNftStruct
+struct FNftListStruct
 {
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FNftTokenStruct> AccountNftTokens;
+	TArray<FNftTokenStruct> NftTokens;
 };

@@ -1,15 +1,15 @@
-import { NearNFTStruct } from '../models/NFT';
+import { NearNFTStruct, NftResponse } from '../models/NFT';
 import * as blockchain from '../utils/blockchain';
 import { keysToCamel } from '../utils/snakeToCamelCase';
 
 class NftService {
   getNftTotalSupply = async (contractId: string) => {
-    const nftTotalSupply = await blockchain.masterAccount.viewFunction(
+    const nftSupply = await blockchain.masterAccount.viewFunction(
       contractId,
       'nft_total_supply',
       {},
     );
-    return { nftTotalSupply };
+    return { nftSupply };
   };
 
   getNftTokens = async (contractId: string, fromIndex?: string, limit?: number) => {

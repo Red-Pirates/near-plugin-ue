@@ -1,23 +1,22 @@
-export interface NFTResponse {
+export interface NftResponse {
   tokenId: string;
   ownerId: string;
-  title: string | null;
-  description: string | null;
-  media: string | null;
-  copies: number | null;
-  mediaHash: string | null;
-  issuedAt: number | null;
-  expiresAt: number | null;
-  startsAt: number | null;
-  updatedAt: number | null;
-  extra: string | null;
-  reference: string | null;
-  referenceHash: string | null;
-}
-
-export interface GetTokenRequest {
-  tokenId: string;
-  contractId: string;
+  metadata: {
+    title: string | null;
+    description: string | null;
+    media: string | null;
+    copies: number | null;
+    mediaHash: string | null;
+    issuedAt: number | null;
+    expiresAt: number | null;
+    startsAt: number | null;
+    updatedAt: number | null;
+    extra: string | null;
+    reference: string | null;
+    referenceHash: string | null;
+  };
+  approvedAccountIds: Record<string, number>;
+  royalty: Record<string, number>;
 }
 
 export interface NearNFTMetadata {
@@ -39,4 +38,6 @@ export interface NearNFTStruct {
   token_id: string;
   owner_id: string;
   metadata: NearNFTMetadata;
+  approved_account_ids: Record<string, number>;
+  royalty: Record<string, number>;
 }
