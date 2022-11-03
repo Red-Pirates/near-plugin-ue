@@ -7,6 +7,7 @@
 #include "FGetAccountNFTRequestStruct.h"
 #include "FAccountNftStruct.h"
 #include "FAccountStateStruct.h"
+#include "FCallFunctionArgsStruct.h"
 #include "FNftSupplyStruct.h"
 #include "FCreateAccountRequestStruct.h"
 #include "FFtMetadataStruct.h"
@@ -15,7 +16,9 @@
 #include "FNftContractMetaStruct.h"
 #include "FNftListStruct.h"
 #include "FNftTokenStruct.h"
+#include "FViewFunctionArgsStruct.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Json.h"
 #include "HttpNearBackManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDAtaReceived);
@@ -58,6 +61,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FNftContractMetaStruct NftMetadata;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FJsonObjectWrapper ViewFunctionResponseObject;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FJsonObjectWrapper CallFunctionResponseObject;
+	
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnAccountBalanceReceived;
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
@@ -84,6 +92,11 @@ public:
 	FOnDAtaReceived OnNftMetadataReceived;
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnNftTokenReceived;
+	
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FOnDAtaReceived OnViewFunctionReceived;
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FOnDAtaReceived OnCallFunctionReceived;
 	
 	UFUNCTION(BlueprintCallable)
 	void SendAccountBalanceRequest(FString AccountId);
@@ -136,6 +149,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SendNftTokenInfoRequest(FString ContractId, FString TokenId);
 	void OnNftTokenInfoReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	UFUNCTION(BlueprintCallable)
+	void SendViewFunctionRequest(FViewFunctionArgsStruct RequestStruct);
+	void OnViewFunctionReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	UFUNCTION(BlueprintCallable)
+	void SendCallFunctionRequest(FCallFunctionArgsStruct RequestStruct);
+	void OnCallFunctionReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
 	UFUNCTION(BlueprintCallable)
 	void Login(FString ContractId);

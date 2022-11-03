@@ -22,7 +22,7 @@ class ContractService {
       contractId: contractId,
       methodName: method,
       args: params,
-      gas: attachedGas,
+      gas: attachedGas || '25000000000000',
       attachedDeposit: attachedTokens,
     });
   };

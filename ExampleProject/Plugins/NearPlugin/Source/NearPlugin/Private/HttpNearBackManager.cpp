@@ -255,8 +255,8 @@ void UHttpNearBackManager::OnNftTotalSupplyReceivedResponse(FHttpRequestPtr Requ
 {
 	if (!ResponseIsValid(Response, bWasSuccessful)) return;
 	const FString Data = Response->GetContentAsString();
-	FJsonObjectConverter::JsonObjectStringToUStruct<FNftSupplyStruct>(*Data, &NftSupply);
-	UE_LOG(LogClass, Log, TEXT("NFT total supply:  %s "), *NftSupply.NftSupply);
+	FJsonObjectConverter::JsonObjectStringToUStruct<FNftSupplyStruct>(*Data, &NftTotalSupply);
+	UE_LOG(LogClass, Log, TEXT("NFT total supply:  %s "), *NftTotalSupply.NftSupply);
 	OnNftTotalSupplyReceived.Broadcast();
 }
 
@@ -300,6 +300,58 @@ void UHttpNearBackManager::OnNftTokenInfoReceivedResponse(FHttpRequestPtr Reques
 	UE_LOG(LogClass, Log, TEXT("NFT  token id:  %s "), *NftToken.TokenId);
 	UE_LOG(LogClass, Log, TEXT("NFT owner id:  %s "), *NftToken.OwnerId);
 	OnNftTokenReceived.Broadcast();
+}
+
+void UHttpNearBackManager::SendViewFunctionRequest(FViewFunctionArgsStruct RequestStruct )
+{
+
+	FString ContentJsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(FViewFunctionArgsStruct::StaticStruct(), &RequestStruct,
+													ContentJsonString, 0, 0);
+	
+	FHttpModule* Module = &FHttpModule::Get();
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnViewFunctionReceivedResponse);
+	Request->SetURL("http://localhost:3000/api/v1/contracts/view");
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->SetContentAsString(ContentJsonString);
+	Request->ProcessRequest();
+}
+
+void UHttpNearBackManager::OnViewFunctionReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+															  bool bWasSuccessful)
+{
+	if (!ResponseIsValid(Response, bWasSuccessful)) return;
+	const FString Data = Response->GetContentAsString();
+	FJsonObjectConverter::JsonObjectStringToUStruct<FJsonObjectWrapper>(*Data, &ViewFunctionResponseObject);
+	UE_LOG(LogClass, Log, TEXT("View function data:  %s "), *Data);
+	OnViewFunctionReceived.Broadcast();
+}
+
+void UHttpNearBackManager::SendCallFunctionRequest(FCallFunctionArgsStruct RequestStruct)
+{
+	FString ContentJsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(FCallFunctionArgsStruct::StaticStruct(), &RequestStruct,
+													ContentJsonString, 0, 0);
+	FHttpModule* Module = &FHttpModule::Get();
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnCallFunctionReceivedResponse);
+	Request->SetURL("http://localhost:3000/api/v1/contracts/call");
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->SetContentAsString(ContentJsonString);
+	Request->ProcessRequest();
+}
+
+void UHttpNearBackManager::OnCallFunctionReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+															  bool bWasSuccessful)
+{
+	if (!ResponseIsValid(Response, bWasSuccessful)) return;
+	const FString Data = Response->GetContentAsString();
+	FJsonObjectConverter::JsonObjectStringToUStruct<FJsonObjectWrapper>(*Data, &CallFunctionResponseObject);
+	UE_LOG(LogClass, Log, TEXT("Call function data:  %s "), *Data);
+	OnCallFunctionReceived.Broadcast();
 }
 
 void UHttpNearBackManager::Login(FString ContractId)
