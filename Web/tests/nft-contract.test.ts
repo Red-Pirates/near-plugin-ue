@@ -85,7 +85,7 @@ describe('Nft endpoints', () => {
       .get(`${PATH_PREFIX}/nft-contracts/${nftAccount.accountId}/total-supply`)
       .then((res) => {
         expect(res.statusCode).toEqual(200);
-        expect(res.body.nftTotalSupply).toEqual('2');
+        expect(res.body.nftSupply).toEqual('2');
       });
   });
 

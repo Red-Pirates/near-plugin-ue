@@ -37,6 +37,8 @@ export const invokeViewFunction = (
 };
 
 interface CallFunctionBody extends ContractParams {
+  accountId: string;
+  secretKey: string;
   method: string;
   params: Record<string, any>;
   attachedGas?: string;
@@ -50,6 +52,8 @@ export const callContractFunction = (
 ): void => {
   contractService
     .callCallContractFunction(
+      req.body.accountId,
+      req.body.secretKey,
       req.body.contractId,
       req.body.method,
       req.body.params,

@@ -47,7 +47,7 @@ describe('Ft endpoints', () => {
       .get(`${PATH_PREFIX}/ft-contracts/${ftAccount.accountId}/total-supply`)
       .then((res) => {
         expect(res.statusCode).toEqual(200);
-        expect(res.body.totalSupply).toEqual('1,000,000,000');
+        expect(res.body.balance).toEqual('1,000,000,000');
       });
   });
 

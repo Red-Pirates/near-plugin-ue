@@ -302,6 +302,30 @@ void UHttpNearBackManager::OnNftTokenInfoReceivedResponse(FHttpRequestPtr Reques
 	OnNftTokenReceived.Broadcast();
 }
 
+void UHttpNearBackManager::SendDeployContractRequest(FDeployContractRequestStruct RequestStruct)
+{
+	FString ContentJsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(FDeployContractRequestStruct::StaticStruct(), &RequestStruct,
+													ContentJsonString, 0, 0);
+	FHttpModule* Module = &FHttpModule::Get();
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Module->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::OnDeployContractReceivedResponse);
+	Request->SetURL("http://localhost:3000/api/v1/contracts/deploy");
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->SetContentAsString(ContentJsonString);
+	Request->ProcessRequest();
+}
+
+void UHttpNearBackManager::OnDeployContractReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
+														   bool bWasSuccessful)
+{
+	if (!ResponseIsValid(Response, bWasSuccessful)) return;
+
+	UE_LOG(LogTemp, Log, TEXT("Contract deployed"));
+	OnContractDeployed.Broadcast();
+}
+
 void UHttpNearBackManager::SendViewFunctionRequest(FViewFunctionArgsStruct RequestStruct )
 {
 
@@ -367,46 +391,54 @@ void UHttpNearBackManager::Login(FString ContractId)
 void UHttpNearBackManager::OnLoginReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response,
                                                    bool bWasSuccessful)
 {
-	if (!ResponseIsValid(Response, bWasSuccessful)) return;
-	const FString Data = Response->GetContentAsString();
-	UE_LOG(LogClass, Log, TEXT("LoginUrl:  %s "), *Data);
+	try {
+		if (!ResponseIsValid(Response, bWasSuccessful)) return;
+		const FString Data = Response->GetContentAsString();
 
-	FLoginUrlStruct DataStruct;
-	FJsonObjectConverter::JsonObjectStringToUStruct<FLoginUrlStruct>(Data, &DataStruct);
+		FLoginUrlStruct DataStruct;
+		FJsonObjectConverter::JsonObjectStringToUStruct<FLoginUrlStruct>(Data, &DataStruct);
+		UE_LOG(LogClass, Log, TEXT("LoginUrl:  %s "), *DataStruct.LoginUrl);
+		UserSecretKey = *DataStruct.SecretKey;
+		UE_LOG(LogClass, Log, TEXT("SecretKey: \"%s\"."), *UserSecretKey);
 
-	FPlatformProcess::LaunchURL(*DataStruct.LoginUrl, nullptr, nullptr);
+		FPlatformProcess::LaunchURL(*DataStruct.LoginUrl, nullptr, nullptr);
 
-	const FString ServerURL = TEXT("ws://localhost:5000");
-	const FString ServerProtocol = TEXT("ws");
+		const FString ServerURL = TEXT("ws://localhost:5000");
+		const FString ServerProtocol = TEXT("ws");
 
-	TSharedRef<IWebSocket> Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
+		TSharedRef<IWebSocket> Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
 
-	Socket->OnConnected().AddLambda([Socket]()
-	{
-		UE_LOG(LogTemp, Log, TEXT("Connected to websocket server."));
-	});
+		Socket->OnConnected().AddLambda([Socket]()
+		{
+			UE_LOG(LogTemp, Log, TEXT("Connected to websocket server."));
+		});
 
-	Socket->OnConnectionError().AddLambda([](const FString& Error)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Failed to connect to websocket server with error: \"%s\"."), *Error);
-	});
+		Socket->OnConnectionError().AddLambda([](const FString& Error)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Failed to connect to websocket server with error: \"%s\"."), *Error);
+		});
 
-	Socket->OnMessage().AddLambda([&](const FString& Message)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Received message from websocket server: \"%s\"."), *Message);
-		UserAccountId = Message;
-		UE_LOG(LogTemp, Log, TEXT("User Account Id: \"%s\"."), *UserAccountId);
-		OnUserAccountIdReceived.Broadcast();
-	});
+		Socket->OnMessage().AddLambda([&](const FString& Message)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Received message from websocket server: \"%s\"."), *Message);
+			UserAccountId = Message;
+			UE_LOG(LogTemp, Log, TEXT("User Account Id: \"%s\"."), *UserAccountId);
+			OnUserAccountIdReceived.Broadcast();
+		});
 
-	Socket->OnClosed().AddLambda([&](int32 StatusCode, const FString& Reason, bool bWasClean)
-	{
-		UE_LOG(LogTemp, Log,
-		       TEXT("Connection to websocket server has been closed with status code: \"%d\" and reason: \"%s\"."),
-		       StatusCode, *Reason);
-	});
+		Socket->OnClosed().AddLambda([&](int32 StatusCode, const FString& Reason, bool bWasClean)
+		{
+			UE_LOG(LogTemp, Log,
+			   TEXT("Connection to websocket server has been closed with status code: \"%d\" and reason: \"%s\"."),
+			   StatusCode, *Reason);
+		});
 
-	Socket->Connect();
+		Socket->Connect();
+	}
+	catch (const std::exception e)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Login error: %s"), *e.what());
+		}
 }
 
 bool UHttpNearBackManager::ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful)

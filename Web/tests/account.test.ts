@@ -48,16 +48,6 @@ describe('Account endpoints', () => {
     });
   });
 
-  it('should get transaction details', async () => {
-    return request
-      .get(
-        `${PATH_PREFIX}/accounts/${testAccount.accountId}/transactions/FB7YE1ZapLwJW6oWLXN4hzmdftV9dLqBZL1vURdJn7kt`,
-      )
-      .then((res) => {
-        expect(res.statusCode).toEqual(200);
-      });
-  });
-
   it('should create a new account', async () => {
     const newAccountName = generateRandomString();
     return request

@@ -9,4 +9,7 @@ struct FLoginUrlStruct
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString LoginUrl;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString SecretKey;
 };

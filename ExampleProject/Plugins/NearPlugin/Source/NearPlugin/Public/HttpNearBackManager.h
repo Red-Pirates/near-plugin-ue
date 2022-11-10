@@ -10,6 +10,7 @@
 #include "FCallFunctionArgsStruct.h"
 #include "FNftSupplyStruct.h"
 #include "FCreateAccountRequestStruct.h"
+#include "FDeployContractRequestStruct.h"
 #include "FFtMetadataStruct.h"
 #include "FFtTotalSupplyStruct.h"
 #include "FGetNftListRequestStruct.h"
@@ -32,6 +33,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FString UserAccountId;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    FString UserSecretKey;
+	
     UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FAccountBalanceStruct AccountBalance;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
@@ -92,7 +96,9 @@ public:
 	FOnDAtaReceived OnNftMetadataReceived;
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnNftTokenReceived;
-	
+
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FOnDAtaReceived OnContractDeployed;
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FOnDAtaReceived OnViewFunctionReceived;
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
@@ -109,7 +115,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SendAccountDetailsRequest(FString AccountId);
 	void OnAccountDetailsReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	
+
+	UFUNCTION(BlueprintCallable)
+	void SendDeployContractRequest(FDeployContractRequestStruct RequestStruct);
+	void OnDeployContractReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
 	UFUNCTION(BlueprintCallable)
 	void SendAccountFtBalanceRequest(FString AccountId, FString ContractId);
     void OnAccountFtBalanceReceivedResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);

@@ -1,9 +1,9 @@
 import * as blockchain from '../utils/blockchain';
+import { near } from '../utils/blockchain';
 import { formatNearAmount } from 'near-api-js/lib/utils/format';
 import { KeyPair } from 'near-api-js';
 import config from '../config';
 import { keysToCamel } from '../utils/snakeToCamelCase';
-import { near } from '../utils/blockchain';
 
 class UserAccountService {
   getAccountBalance = async (accountId: string) => {
