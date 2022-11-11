@@ -6,12 +6,6 @@ USTRUCT(BlueprintType)
 struct FDeployContractRequestStruct{
 	
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString AccountId;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SecretKey;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FileName;   
