@@ -6,11 +6,18 @@ Near plugin contains basic functionality for interacting with the Near blockchai
 
 - Sign in with Near 
 - Check account balance 
+- Check account state
+- Check account details
+- Deploy contract
 - Creation of a new account
-- Invoke contract view functions
+- Invoke contract View function
+- Invoke contract Call function
 - Creation of a transaction to invoke the payable contract method
-- Get balance for account using [NEP-141](https://nomicon.io/Standards/Tokens/FungibleToken/Core)
+- Get FT balance for account using [NEP-141](https://nomicon.io/Standards/Tokens/FungibleToken/Core)
+- Get FT contract metadata using [NEP-148](https://nomicon.io/Standards/Tokens/FungibleToken/Metadata)
 - Get NFT for owner, get NFT supply using [NEP-181](https://nomicon.io/Standards/Tokens/NonFungibleToken/Enumeration)
+- Get NFT contract metadata using [NEP-177](https://nomicon.io/Standards/Tokens/NonFungibleToken/Metadata)
+- Get NFT details using [NEP-171](https://nomicon.io/Standards/Tokens/NonFungibleToken/Core)
 
 ## Requirements
 
